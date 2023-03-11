@@ -46,9 +46,9 @@ podTemplate(yaml: '''
           ./gradlew build
           mv ./build/libs/calculator-0.0.1-SNAPSHOT.jar /mnt
           '''
-          stage("Feature Test") {
+          stage("Feature Branch Testing") {
             if (env.BRANCH_NAME == 'feature') {
-            echo "I am the ${env.BRANCH_NAME} branch"
+            echo "This is the ${env.BRANCH_NAME} branch"
                 
                     try {
                         sh '''
@@ -60,25 +60,24 @@ podTemplate(yaml: '''
                         ./gradlew jacocoTestReport '''
                         }
                     catch (Exception E) {
-                        echo 'Failure detected for Feature test'
+                        echo 'Feature branch test failure'
                         }
                 }
           }
         
-        stage("Playground Test"){
+        stage("Playground Branch Testing"){
             if (env.BRANCH_NAME == 'playground') 
             {
-                echo "No tests run on Playground Branch"
+                echo "Playground Branch has no testing"
             }
         }
             
-        stage("Main Test") {
+        stage("Main Branch Testing") {
             if (env.BRANCH_NAME == 'main')
               {
-                echo "I am the ${env.BRANCH_NAME} branch"
+                echo "This is the ${env.BRANCH_NAME} branch"
                     try {
                         sh '''
-                        pwd
                         cd Chapter08/sample1
                         chmod +x gradlew
                         ./gradlew checkstyleMain
@@ -87,7 +86,7 @@ podTemplate(yaml: '''
                         ./gradlew jacocoTestReport '''
                         }
                     catch (Exception E) {
-                        echo 'Failure detected for Main test'
+                        echo 'Main test failure'
                         }
               }
         }
