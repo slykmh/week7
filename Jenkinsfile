@@ -41,7 +41,6 @@ podTemplate(yaml: '''
         git 'https://github.com/slykmh/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git'
         stage('Build a gradle project') {
           sh '''
-          pwd
           cd Chapter08/sample1
           chmod +x gradlew
           ./gradlew build
