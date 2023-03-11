@@ -49,45 +49,42 @@ podTemplate(yaml: '''
           stage("Feature Branch Testing") {
             if (env.BRANCH_NAME == 'feature') {
             echo "This is the ${env.BRANCH_NAME} branch"
-                
-                    try {
-                        sh '''
-                        pwd
-                        cd Chapter08/sample1
-                        chmod +x gradlew
-                        ./gradlew checkstyleMain
-                        ./gradlew test
-                        ./gradlew jacocoTestReport '''
-                        }
-                    catch (Exception E) {
-                        echo 'Feature branch test failure'
-                        }
+              try {
+                sh '''
+                pwd
+                cd Chapter08/sample1
+                chmod +x gradlew
+                ./gradlew checkstyleMain
+                ./gradlew test
+                ./gradlew jacocoTestReport '''
                 }
+               catch (Exception E) {
+                 echo 'Feature branch test failure'
+                 }
+               }
           }
-        
         stage("Playground Branch Testing"){
-            if (env.BRANCH_NAME == 'playground') 
-            {
-                echo "Playground Branch has no testing"
-            }
-        }
-            
-        stage("Main Branch Testing") {
-            if (env.BRANCH_NAME == 'main')
-              {
-                echo "This is the ${env.BRANCH_NAME} branch"
-                    try {
-                        sh '''
-                        cd Chapter08/sample1
-                        chmod +x gradlew
-                        ./gradlew checkstyleMain
-                        ./gradlew test
-                        ./gradlew jacocoTestCoverageVerification
-                        ./gradlew jacocoTestReport '''
-                        }
-                    catch (Exception E) {
-                        echo 'Main test failure'
-                        }
+          if (env.BRANCH_NAME == 'playground') 
+          {
+            echo "Playground Branch has no testing"
+          }
+         }
+         stage("Main Branch Testing") {
+           if (env.BRANCH_NAME == 'main')
+             {
+               echo "This is the ${env.BRANCH_NAME} branch"
+                 try {
+                   sh '''
+                   cd Chapter08/sample1
+                   chmod +x gradlew
+                   ./gradlew checkstyleMain
+                   ./gradlew test
+                   ./gradlew jacocoTestCoverageVerification
+                   ./gradlew jacocoTestReport '''
+                   }
+               catch (Exception E) {
+                 echo 'Main test failure'
+               }
               }
         }
       }
@@ -97,15 +94,15 @@ podTemplate(yaml: '''
     stage('Build Java Image') {
       container('kaniko') {
         stage('Kaniko Container Feature Branch'){
-            if (env.BRANCH_NAME == 'feature'){
-              stage('Build a gradle project') {
-              sh '''
-                echo 'FROM openjdk:8-jre' > Dockerfile
-                echo 'COPY ./calculator-0.0.1-SNAPSHOT.jar app.jar' >> Dockerfile
-                echo 'ENTRYPOINT ["java", "-jar", "app.jar"]' >> Dockerfile
-                mv /mnt/calculator-0.0.1-SNAPSHOT.jar .
-                /kaniko/executor --context `pwd` --destination slykmh/calculator-feature:0.1
-                '''
+          if (env.BRANCH_NAME == 'feature'){
+          stage('Build a gradle project') {
+            sh '''
+            echo 'FROM openjdk:8-jre' > Dockerfile
+            echo 'COPY ./calculator-0.0.1-SNAPSHOT.jar app.jar' >> Dockerfile
+            echo 'ENTRYPOINT ["java", "-jar", "app.jar"]' >> Dockerfile
+            mv /mnt/calculator-0.0.1-SNAPSHOT.jar .
+            /kaniko/executor --context `pwd` --destination slykmh/calculator-feature:0.1
+            '''
             }
           }
         }
