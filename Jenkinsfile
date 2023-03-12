@@ -63,13 +63,7 @@ podTemplate(yaml: '''
                  }
                }
           }
-        stage("Playground Branch Testing"){
-          if (env.BRANCH_NAME == 'playground') 
-          {
-            echo "Playground branch has no testing"
-          }
-         }
-         stage("Main Branch Testing") {
+          stage("Main Branch Testing") {
            if (env.BRANCH_NAME == 'main')
              {
                echo "This is the ${env.BRANCH_NAME} branch"
@@ -85,7 +79,7 @@ podTemplate(yaml: '''
                catch (Exception E) {
                  echo 'Main branch test failure'
               }
-             }
+          }
          stage("Playground Branch Testing"){
           if (env.BRANCH_NAME == 'playground')
           {
