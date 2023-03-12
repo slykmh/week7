@@ -37,33 +37,88 @@ podTemplate(yaml: '''
 ''') {
   node(POD_LABEL) {
     stage('Build a gradle project') {
-      git 'https://github.com/slykmh/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git'
       container('gradle') {
+        git 'https://github.com/slykmh/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git'
         stage('Build a gradle project') {
           sh '''
-          cd chapter08/sample1
+          cd Chapter08/sample1
           chmod +x gradlew
           ./gradlew build
           mv ./build/libs/calculator-0.0.1-SNAPSHOT.jar /mnt
           '''
-        }
+          stage("Feature Branch Testing") {
+            if (env.BRANCH_NAME == 'feature') {
+            echo "This is the ${env.BRANCH_NAME} branch"
+              try {
+                sh '''
+                pwd
+                cd Chapter08/sample1
+                chmod +x gradlew
+                ./gradlew test
+                ./gradlew checkstyleMain
+                ./gradlew jacocoTestReport '''
+                }
+               catch (Exception E) {
+                 echo 'Feature branch test failure'
+                 }
+               }
+          }
+          stage("Main Branch Testing") {
+           if (env.BRANCH_NAME == 'main')
+             {
+               echo "This is the ${env.BRANCH_NAME} branch"
+                 try {
+                   sh '''
+                   cd Chapter08/sample1
+                   chmod +x gradlew
+                   ./gradlew test
+                   ./gradlew checkstyleMain
+                   ./gradlew jacocoTestCoverageVerification
+                   ./gradlew jacocoTestReport '''
+                   }
+               catch (Exception E) {
+                 echo 'Main branch test failure'
+              }
+          }
+         stage("Playground Branch Testing"){
+          if (env.BRANCH_NAME == 'playground')
+          {
+            echo "Playground branch has no testing"
+          }
+         } 
+         }
       }
     }
-
+  }
     stage('Build Java Image') {
       container('kaniko') {
-        stage('Build a container') {
-          sh '''
-          echo 'FROM openjdk:8-jre' > Dockerfile
-          echo 'COPY ./calculator-0.0.1-SNAPSHOT.jar app.jar' >> Dockerfile
-          echo 'ENTRYPOINT ["java", "-jar", "app.jar"]' >> Dockerfile
-          ls /mnt/*jar
-          mv /mnt/calculator-0.0.1-SNAPSHOT.jar .
-          /kaniko/executor --context `pwd` --destination slykmh/hello-kaniko:1.0
-          '''
+        stage('Kaniko Container Feature Branch'){
+          if (env.BRANCH_NAME == 'feature'){
+          stage('Build a gradle project') {
+            sh '''
+            echo 'FROM openjdk:8-jre' > Dockerfile
+            echo 'COPY ./calculator-0.0.1-SNAPSHOT.jar app.jar' >> Dockerfile
+            echo 'ENTRYPOINT ["java", "-jar", "app.jar"]' >> Dockerfile
+            mv /mnt/calculator-0.0.1-SNAPSHOT.jar .
+            /kaniko/executor --context `pwd` --destination slykmh/calculator-feature:0.1
+            '''
+            }
+          }
+        }
+        stage('Kaniko Container Main Branch'){
+          if (env.BRANCH_NAME == 'main'){
+            stage('Build a gradle project') {
+              sh '''
+              echo 'FROM openjdk:8-jre' > Dockerfile
+              echo 'COPY ./calculator-0.0.1-SNAPSHOT.jar app.jar' >> Dockerfile
+              echo 'ENTRYPOINT ["java", "-jar", "app.jar"]' >> Dockerfile
+              mv /mnt/calculator-0.0.1-SNAPSHOT.jar .
+              /kaniko/executor --context `pwd` --destination slykmh/calculator:1.0
+              '''
+            }
+          }
         }
       }
     }
-
   }
 }
