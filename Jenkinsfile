@@ -54,8 +54,8 @@ podTemplate(yaml: '''
                 pwd
                 cd Chapter08/sample1
                 chmod +x gradlew
-                ./gradlew checkstyleMain
                 ./gradlew test
+                ./gradlew checkstyleMain
                 ./gradlew jacocoTestReport '''
                 }
                catch (Exception E) {
@@ -77,8 +77,8 @@ podTemplate(yaml: '''
                    sh '''
                    cd Chapter08/sample1
                    chmod +x gradlew
-                   ./gradlew checkstyleMain
                    ./gradlew test
+                   ./gradlew checkstyleMain
                    ./gradlew jacocoTestCoverageVerification
                    ./gradlew jacocoTestReport '''
                    }
